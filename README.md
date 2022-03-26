@@ -1,2 +1,2 @@
 # MIT6.006
-Some course codes
+The repository will store my codes of the course MIT6.006.
