@@ -41,17 +41,17 @@ int main()
 			switch(ch)
 			{
 				case '+': sum = a + b; 
-						  push(sum,S);
-						  break;
+					  push(sum,S);
+					  break;
 				case '-': sum = a - b; 
-						  push(sum,S);
-						  break;
+					  push(sum,S);
+					  break;
 				case '*': sum = a * b;
-						  push(sum,S);
-						  break;
+					  push(sum,S);
+					  break;
 				case '/': sum = a / b;
-						  push(sum,S);
-						  break;
+					  push(sum,S);
+					  break;
 			} 
 		}
 		if(getchar() == '\n') break;
