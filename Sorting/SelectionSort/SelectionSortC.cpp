@@ -8,7 +8,7 @@ void PrintArray(int* Array);
 
 int main()
 {
-	int* Array = (int*)malloc(sizeof(Size));
+	int* Array = (int*)malloc(Size);
 	Array[0] = 5;
 	Array[1] = 2;
 	Array[2] = 7;
