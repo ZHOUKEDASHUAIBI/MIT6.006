@@ -37,7 +37,6 @@ int main()
 	{
 		flag = Insert(a[i], H);
 		printf("%d ",flag);
-		//printf("%d ",a[i]);
 	}
 	printf("\n");
 	for(i = 0; i < 11; i++)
