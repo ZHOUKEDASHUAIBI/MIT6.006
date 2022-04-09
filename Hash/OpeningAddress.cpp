@@ -26,6 +26,7 @@ int Hash(int key, int TableSize);
 int Find(int key, HashTable H);
 bool Insert(int key, HashTable H);
 bool Delete(int key, HashTable H);
+void PrintHash(HashTable H);
 
 int main()
 {		
@@ -39,10 +40,11 @@ int main()
 		printf("%d ",flag);
 	}
 	printf("\n");
-	for(i = 0; i < 11; i++)
-	{
-		printf("%d ",H->TheCells[i].Element);
-	}
+	PrintHash(H);
+	flag = Delete(7,H);
+	PrintHash(H);
+	flag = Delete(18,H);
+	PrintHash(H);
 	return 0;
 }
 
@@ -131,7 +133,7 @@ bool Insert(int key, HashTable H)
 bool Delete(int key, HashTable H)
 {
 	int index = Find(key, H);
-	if(H->TheCells[index].info == empty)
+	if(H->TheCells[index].info == legitimate)
 	{
 		H->TheCells[index].info = deleted;
 		return true;
@@ -141,4 +143,17 @@ bool Delete(int key, HashTable H)
 		printf("无该键值");
 		return false; 
 	}
+}
+
+void PrintHash(HashTable H)
+{
+	int i;
+	for(i = 0; i < 11; i++)
+	{
+		if(H->TheCells[i].info == legitimate)
+			printf("%d ",H->TheCells[i].Element);
+		else
+			printf("0 ");
+	}
+	printf("\n");
 }
