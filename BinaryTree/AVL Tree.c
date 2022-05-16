@@ -1,12 +1,13 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<math.h> 
-#define Size 100
+#define SIZE 100
 
 struct AVLTree
 {
 	int element;
 	int height;
+	int size;
 	struct AVLTree* left;
 	struct AVLTree* right;
 }; 
@@ -19,11 +20,14 @@ Tree RLR(Tree T);
 Tree LRR(Tree T);
 int Max(int a, int b);
 int Height(Tree T);
+int Size(Tree T);
+void swap(Tree T1, Tree T2);
+Tree FindMax(Tree T);
 Tree Insert(Tree T, int x);
 Tree Delete(Tree T, int x);
 struct AVLTree** CreateQueue(int* front, int* rear); 
-void Enqueue(AVLTree* x, AVLTree** queue, int* rear);
-Tree Dequeue(AVLTree** queue, int* front);
+void Enqueue(struct AVLTree* x,struct AVLTree** queue, int* rear);
+Tree Dequeue(struct AVLTree** queue, int* front);
 void TreeVisual(Tree T);
 void TreeLineVisual(Tree T);
 void PrintTree(int* val, int h, int len);
@@ -31,21 +35,48 @@ void PrintTree(int* val, int h, int len);
 int main()
 {
 	Tree T = (Tree)malloc(sizeof(struct AVLTree));
-	T->element = 20;
+	T->element = 8;
 	T->left = NULL;
 	T->right = NULL;
 	T->height = 0;
-	T = Insert(T, 4);
-	T = Insert(T, 26);
+	T->size = 0;
+	T = Insert(T, 5);
+	T = Insert(T, 10);
 	T = Insert(T, 3);
-	T = Insert(T, 9);
-	T = Insert(T, 21);
-	T = Insert(T, 30);
-	T = Insert(T, 2);
 	T = Insert(T, 7);
+	T = Insert(T, 9);
+	T = Insert(T, 12);
+	T = Insert(T, 2);
+	T = Insert(T, 4);
+	T = Insert(T, 6);
 	T = Insert(T, 11);
-	T = Insert(T, 8);
-	TreeVisual(T);
+	T = Insert(T, 1); 
+	printf("%d", T->left->size);
+	TreeLineVisual(T);
+	T = Delete(T, 5);
+	TreeLineVisual(T);
+	T = Delete(T, 8);
+	TreeLineVisual(T);
+	T = Delete(T, 4);
+	TreeLineVisual(T);
+	T = Delete(T, 9);
+	TreeLineVisual(T);
+	T = Delete(T, 3);
+	TreeLineVisual(T);
+	T = Delete(T, 2);
+	TreeLineVisual(T);
+	T = Delete(T, 7);
+	TreeLineVisual(T);
+	T = Delete(T, 1);
+	TreeLineVisual(T);
+	T = Delete(T, 12);
+	TreeLineVisual(T);
+	T = Delete(T, 6);
+	TreeLineVisual(T);
+	T = Delete(T, 10);
+	TreeLineVisual(T);
+	T = Delete(T, 11);
+	TreeLineVisual(T);
 	return 0;
 }
 
@@ -56,6 +87,8 @@ Tree LR(Tree T)
 	tmp->right = T; 
 	T->height = Max(Height(T->left), Height(T->right)) + 1;
 	tmp->height = Max(Height(tmp->left), Height(tmp->right)) + 1;
+	T->size = Size(T->left) + Size(T->right) + 1;
+	tmp->size = Size(tmp->left) + Size(tmp->right) + 1;
 	return tmp;					
 }
 
@@ -66,6 +99,8 @@ Tree RR(Tree T)
 	tmp->left = T;
 	T->height = Max(Height(T->left), Height(T->right)) + 1;
 	tmp->height = Max(Height(tmp->left), Height(tmp->right)) + 1;
+	T->size = Size(T->left) + Size(T->right) + 1;
+	tmp->size = Size(tmp->left) + Size(tmp->right) + 1;
 	return tmp;
 }
 
@@ -99,6 +134,27 @@ int Height(Tree T)
 	else return T->height;
 }
 
+int Size(Tree T)
+{
+	if(T == NULL) return 0;
+	else return T->size;
+}
+
+void swap(Tree T1, Tree T2)
+{
+	int tmp = T1->element;
+	T1->element = T2->element;
+	T2->element = tmp;
+}
+
+
+Tree FindMax(Tree T)
+{
+	if(T == NULL) return NULL;
+	if(T->right == NULL) return T;
+	else return FindMax(T->right);
+}
+
 Tree Insert(Tree T, int x)
 {
 	if(T == NULL)
@@ -128,32 +184,47 @@ Tree Insert(Tree T, int x)
 		}
 	}
 	T->height = Max(Height(T->left), Height(T->right)) + 1;
+	T->size = Size(T->left) + Size(T->right) + 1;
 	return T;
 }
 
 Tree Delete(Tree T, int x)
 {
-	if(x == T->element)
-	{
-		free(T);
-		return NULL;
-	}
-	else if(x < T->element)
-	{
-		T->left = Delete(T->left, x);
-		if(Height(T->right) - Height(T->left) == 2)	T = RR(T);
-	}
+	Tree tmp;
+	if(T == NULL) return NULL;
+	if(x < T->element) T->left = Delete(T->left, x);
+	else if(x > T->element) T->right = Delete(T->right, x);
 	else
-	{
-		T->right = Delete(T->right, x);
-		if(Height(T->left) - Height(T->right) == 2) T = LR(T);
+	{	
+		if(T->right == NULL && T->left == NULL) return NULL;
+		else if(T->right && T->left)
+		{
+			tmp = FindMax(T->left);
+			swap(T, tmp);
+			T->left = Delete(T->left, x);
+		}
+		else if(T->right) T = T->right;
+		else T = T->left;
 	}
+	T->height = 1 + Max(Height(T->left), Height(T->right));
+	T->size = Size(T->left) + Size(T->right) + 1;
+	if(Height(T->left) - Height(T->right) == 2)
+	{
+		if(Height(T->left->left) >= Height(T->left->right)) T = LR(T);
+		else T = RLR(T);
+	}
+	else if(Height(T->right) - Height(T->left) == 2)
+	{
+		if(Height(T->right->right) >= Height(T->right->left)) T = RR(T);
+		else T = LRR(T);
+	}
+	
 	return T;
 }
 
 struct AVLTree** CreateQueue(int* front, int* rear)
 {
-	struct AVLTree** queue = (struct AVLTree**)malloc(sizeof(struct AVLTree*) * Size);
+	struct AVLTree** queue = (struct AVLTree**)malloc(sizeof(struct AVLTree*) * SIZE);
 	*front = 0;
 	*rear = 0;
 	return queue;
@@ -177,7 +248,7 @@ void TreeVisual(Tree T)
 	struct AVLTree** queue = CreateQueue(&front, &rear);
 	Tree tmp = T;
 	Enqueue(tmp, queue, &rear);
-	int count = 0, i = 0, len, h = T->height;
+	int count = 0, len, h = T->height;
 	int val[100];
 	while(rear != front && count <= pow(2, h + 1) - 1)
 	{	
@@ -186,6 +257,11 @@ void TreeVisual(Tree T)
 		{
 			Enqueue(tmp->left, queue, &rear);
 			Enqueue(tmp->right, queue, &rear);
+		}
+		else
+		{
+			Enqueue(NULL, queue, &rear);
+			Enqueue(NULL, queue, &rear);
 		}
 		if(tmp == NULL) val[count] = 0;
 		else val[count] = tmp->element;
@@ -228,6 +304,11 @@ void TreeLineVisual(Tree T)
 	int rear, front;
 	struct AVLTree** queue = CreateQueue(&front, &rear);
 	Tree tmp = T;
+	if(T == NULL)
+	{
+		printf("Empty!");
+		return;
+	}
 	Enqueue(tmp, queue, &rear);
 	while(rear != front)
 	{	
@@ -236,4 +317,5 @@ void TreeLineVisual(Tree T)
 		if(tmp->right) Enqueue(tmp->right, queue, &rear);
 		printf("%d ", tmp->element);	
 	}	
+	printf("\n");
 }
